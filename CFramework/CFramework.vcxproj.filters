@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Cheat">
+      <UniqueIdentifier>{fd8a8216-3803-4c7d-8fdc-223a2036a25e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework">
+      <UniqueIdentifier>{1b9817cd-46f9-4439-9419-78d053c3e152}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cheat\SDK">
+      <UniqueIdentifier>{32ca098a-5183-47e8-ae19-3f1ca8e372b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cheat\SDK\GameSDK">
+      <UniqueIdentifier>{2294c04f-d365-473c-a496-2ef6fb1ad748}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cheat\SDK\CEntity">
+      <UniqueIdentifier>{afd37619-aa38-4c63-9a7d-bf8fa35dcf37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\ImGui">
+      <UniqueIdentifier>{46cf1275-1351-429a-afbd-2ae68266b015}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Overlay">
+      <UniqueIdentifier>{0eda9945-ded9-401a-bd2a-5941b3a701f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Memory">
+      <UniqueIdentifier>{2ec0a81b-c95b-4699-8e3e-9dfb04c61d25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Config">
+      <UniqueIdentifier>{70f9546a-a294-4d5b-99d9-418bc96cba65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\ImGui\Fonts">
+      <UniqueIdentifier>{00a1aa39-9b37-4ac6-9211-24f9f71b9cd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cheat\SDK\GameSDK\a2x">
+      <UniqueIdentifier>{7d508f3f-8d98-414c-8f20-2ae221edc750}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheat\SDK\GameSDK\GameSDK.cpp">
+      <Filter>Cheat\SDK\GameSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheat\SDK\CEntity\CEntity.cpp">
+      <Filter>Cheat\SDK\CEntity</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Framework.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Config\Config.cpp">
+      <Filter>Framework\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Memory\Memory.cpp">
+      <Filter>Framework\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Overlay\Manager.cpp">
+      <Filter>Framework\Overlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Overlay\Overlay.cpp">
+      <Filter>Framework\Overlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ImGui\Custom.cpp">
+      <Filter>Framework\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ImGui\imgui.cpp">
+      <Filter>Framework\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ImGui\imgui_demo.cpp">
+      <Filter>Framework\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ImGui\imgui_draw.cpp">
+      <Filter>Framework\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ImGui\imgui_freetype.cpp">
+      <Filter>Framework\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ImGui\imgui_impl_dx11.cpp">
+      <Filter>Framework\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ImGui\imgui_impl_win32.cpp">
+      <Filter>Framework\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ImGui\imgui_tables.cpp">
+      <Filter>Framework\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ImGui\imgui_widgets.cpp">
+      <Filter>Framework\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheat\Features.cpp">
+      <Filter>Cheat</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheat\Menu.cpp">
+      <Filter>Cheat</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheat\Visual.cpp">
+      <Filter>Cheat</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheat\UpdateList.cpp">
+      <Filter>Cheat</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheat\SDK\GameSDK\Offset.cpp">
+      <Filter>Cheat\SDK\GameSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheat\Render.cpp">
+      <Filter>Cheat</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Cheat\SDK\GameSDK\GameSDK.h">
+      <Filter>Cheat\SDK\GameSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheat\SDK\CEntity\CEntity.h">
+      <Filter>Cheat\SDK\CEntity</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Framework.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Config\Config.h">
+      <Filter>Framework\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Memory\Memory.h">
+      <Filter>Framework\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Overlay\Overlay.h">
+      <Filter>Framework\Overlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\Fonts\fa.h">
+      <Filter>Framework\ImGui\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\Fonts\IconsFontAwesome6.h">
+      <Filter>Framework\ImGui\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\Fonts\RobotoRegular.h">
+      <Filter>Framework\ImGui\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\Custom.h">
+      <Filter>Framework\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\imconfig.h">
+      <Filter>Framework\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\imgui.h">
+      <Filter>Framework\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\imgui_freetype.h">
+      <Filter>Framework\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\imgui_impl_dx11.h">
+      <Filter>Framework\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\imgui_impl_win32.h">
+      <Filter>Framework\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\imgui_internal.h">
+      <Filter>Framework\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\imstb_rectpack.h">
+      <Filter>Framework\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\imstb_textedit.h">
+      <Filter>Framework\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ImGui\imstb_truetype.h">
+      <Filter>Framework\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheat\CFramework.h">
+      <Filter>Cheat</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheat\SDK\GameSDK\Offset.h">
+      <Filter>Cheat\SDK\GameSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheat\SDK\GameSDK\a2x\buttons.hpp">
+      <Filter>Cheat\SDK\GameSDK\a2x</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheat\SDK\GameSDK\a2x\client_dll.hpp">
+      <Filter>Cheat\SDK\GameSDK\a2x</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheat\SDK\GameSDK\a2x\offsets.hpp">
+      <Filter>Cheat\SDK\GameSDK\a2x</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
+    <None Include="..\.gitignore" />
+    <None Include="..\LICENSE" />
+  </ItemGroup>
+</Project>
