@@ -40,22 +40,20 @@ void CFramework::RenderInfo()
 void CFramework::RenderESP()
 {
     // AimBot
-    float FOV = 0.f;
-    float MinFov = FLT_MAX;
-    float MinDistance = FLT_MAX;
+    float FOV{ 0.f };
+    float MinFov{ FLT_MAX };
+    float MinDistance{ FLT_MAX };
     CEntity target = CEntity();
-    Vector2 ScreenMiddle = { g.rcSize.right / 2.f, g.rcSize.bottom / 2.f };
+    Vector2 ScreenMiddle{ g.rcSize.right / 2.f, g.rcSize.bottom / 2.f };
 
     // Local
     CEntity local = CEntity();
     local.m_address = offset.GetLocal();
-
-    // Localの更新に失敗したらこの関数を終了
     uintptr_t entitylist = m.Read<uintptr_t>(m.m_dwClientBaseAddr + offset.dwEntityList);
-    if (!local.UpdateStatic(entitylist))
 
+    if (!local.UpdateStatic(entitylist))
         return;
-    if (!local.Update())
+    else if (!local.Update())
         return;
 
     // ViewMatrixとかいろいろ
