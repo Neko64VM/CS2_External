@@ -40,7 +40,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 2;
 
 	// ConfigSystem
-	if (!config.InitConfigSystem("NekoHack", "CS2")) // この場合、%AppData%\Local\NekoHack\CS2 になる。
+	if (!config.InitConfigSystem("NekoHack", "CounterStrike_2")) // この場合、%AppData%\Local\NekoHack\CS2 になる。
 		return 3;
 
 	// Offset Init (Pattern scan
