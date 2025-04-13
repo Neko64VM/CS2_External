@@ -14,25 +14,9 @@ bool CEntity::Update()
 	return true;
 }
 
-bool CEntity::TriggerAllow(const uintptr_t& entitylist, CEntity* local)
-{
-	// pointer
-	uintptr_t list = m.Read<uintptr_t>(entitylist + 0x8 * ((local->m_iIDEntIndex & 0x7FFF) >> 9) + 0x10);
-	m_pCSPlayerPawn = m.Read<uintptr_t>(list + 120 * (local->m_iIDEntIndex & 0x1FF));
-
-	if (!Update())
-		return false;
-
-	m_iTeamNum = m.Read<int>(m_address + Offset::m_iTeamNum);
-
-	return true;
-}
-
 // 毎フレーム更新する必要のない情報
 bool CEntity::UpdateStatic(const uintptr_t& entitylist)
 {
-	//std::unique_lock<std::shared_mutex> lock(mtx);
-
 	// pointer
 	uint32_t pawn = m.Read<uint32_t>(m_address + Offset::m_hPlayerPawn);
 	uintptr_t list = m.Read<uintptr_t>(entitylist + 0x8 * ((pawn & 0x7FFF) >> 9) + 0x10);

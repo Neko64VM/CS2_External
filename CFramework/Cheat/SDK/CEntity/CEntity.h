@@ -44,7 +44,6 @@ public:
 	bool Update();
 	bool UpdateStatic(const uintptr_t& entitylist);
 	bool IsDead();
-	bool TriggerAllow(const uintptr_t& entitylist, CEntity* local);
 
 	Vector3 vecMin();
 	Vector3 vecMax();

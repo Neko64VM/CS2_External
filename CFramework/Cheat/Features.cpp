@@ -3,14 +3,24 @@
 void CFramework::MiscAll()
 {
     /*
+    // Local
     CEntity local = CEntity();
     local.m_address = offset.GetLocal();
+    uintptr_t entitylist = m.Read<uintptr_t>(m.m_dwClientBaseAddr + offset.dwEntityList);
 
-    if (local.IsDead())
+    if (!local.UpdateStatic(entitylist))
+        return;
+    else if (!local.Update())
         return;
 
+    // TriggerBot
+    if (g.TriggerBotENable)
+    {
+        // Your TriggerBot
+    }
+
     // BunnyHop
-    if (utils::IsKeyDown(VK_SPACE))
+    if (g.bHopEnable &&  utils::IsKeyDown(VK_SPACE))
     {
         uint32_t flag = local.GetFlag();
 
@@ -21,9 +31,9 @@ void CFramework::MiscAll()
     }
 
     // RCS
-    if (g.g_RCS)
+    if (g.RCS_Enable)
     {
-        ToDo.
+        // Your RCS
     }
     */
 }
