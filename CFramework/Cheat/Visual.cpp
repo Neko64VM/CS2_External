@@ -1,5 +1,7 @@
 #include "CFramework.h"
 
+#define M_PI 3.14159265358979323846
+
 CEntity lastTarget = CEntity();
 
 void CFramework::RenderInfo()
@@ -60,6 +62,17 @@ void CFramework::RenderESP()
     Matrix ViewMatrix = m.Read<Matrix>(m.m_dwClientBaseAddr + offset.dwViewMatrix);
 
     CEntity* pLocal = &local;
+
+    // 2D Radar
+    float s_radar_scale{ 12.f };
+    Vector2 s_radar_size{ 250.f, 250.f };
+    Vector2 s_radar_pos{ 25.f, g.rcSize.bottom - (s_radar_size.y + 25.f) };
+    Vector2 s_radar_center{ s_radar_pos.x + s_radar_size.x / 2.f, s_radar_pos.y + s_radar_size.y / 2.f };
+
+    // Radar
+    DrawLine(Vector2(s_radar_center.x, s_radar_pos.y), Vector2(s_radar_center.x, s_radar_pos.y + s_radar_size.y), ImColor(1.f, 1.f, 1.f, 1.f), 1.f);
+    DrawLine(Vector2(s_radar_pos.x, s_radar_center.y), Vector2(s_radar_pos.x + s_radar_size.x, s_radar_center.y), ImColor(1.f, 1.f, 1.f, 1.f), 1.f);
+    DrawCircleFilled(s_radar_center, 3.f, ImColor(0.f, 0.65f, 1.f, 1.f), 1.f);
 
     for (auto& entity : this->GetEntityList())
     {
@@ -202,6 +215,22 @@ void CFramework::RenderESP()
         // Rendering
         if (g.bDistance || g.bWeapon && outStr.size() > 0)
             StringEx(Vector2(box.right - Center - (ImGui::CalcTextSize(outStr.c_str()).x / 2.f), box.bottom + 1), shadow_color, g.m_flGlobalAlpha, ImGui::GetFontSize(), outStr.c_str());
+
+        // 2D Radar
+        Vector3 delta = (pEntity->m_vOldOrigin - pLocal->m_vOldOrigin) * -1;
+        float yaw = pLocal->GetViewAngle().y * (M_PI / 180.f);
+        float cosYaw = cosf(yaw);
+        float sinYaw = sinf(yaw);
+
+        Vector2 rotated{
+            delta.y * cosYaw - delta.x * sinYaw,
+            delta.y * sinYaw + delta.x * cosYaw
+        };
+
+        rotated /= s_radar_scale;
+        rotated += s_radar_center;
+
+        DrawCircleFilled(rotated, 3.f, color, 1.f);
 
         if (flDistance > g.AimMaxDistance)
             continue;
