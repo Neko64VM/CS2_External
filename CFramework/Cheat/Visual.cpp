@@ -235,11 +235,12 @@ void CFramework::RenderESP()
             if (fDistance > g.AimMaxDistance)
                 continue;
 
-            /*
-            for (const auto& bone : BoneList)
+            for (int j = 0; j < 32; j++)
             {
+                CSkeletonArray bArray = pEntity->GetBoneList();
+
                 Vector2 BoneScreen{};
-                if (!WorldToScreen(ViewMatrix, g.rcSize, bone, BoneScreen))
+                if (!WorldToScreen(ViewMatrix, g.rcSize, bArray.bone[j].position, BoneScreen))
                     break;
 
                 // In FOV?
@@ -251,18 +252,18 @@ void CFramework::RenderESP()
                     {
                     case 0: // Crosshair
                         if (MinFov > FOV) {
-                            if (target.m_address == NULL || MinDistance > flDistance)
+                            if (target.m_address == NULL || MinDistance > fDistance)
                             {
                                 target = entity;
                                 MinFov = FOV;
-                                MinDistance = flDistance;
+                                MinDistance = fDistance;
                             }
                         }
                         break;
                     case 1: // Game Distance
-                        if (MinDistance > flDistance) {
+                        if (MinDistance > fDistance) {
                             target = entity;
-                            MinDistance = flDistance;
+                            MinDistance = fDistance;
                         }
                         break;
                     }
@@ -270,9 +271,7 @@ void CFramework::RenderESP()
                     break;
                 }
             }
-            */
         }
-
     }
 
     // AimBot - ToDo
