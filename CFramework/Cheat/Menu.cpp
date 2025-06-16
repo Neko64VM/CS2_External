@@ -87,6 +87,7 @@ void CFramework::RenderMenu()
         ImGui::Spacing();
 
         ImGui::Checkbox("ESP", &g.VisualEnable);
+        ImGui::Checkbox("2D Radar", &g.ESP_Radar);
         ImGui::Checkbox("Team ESP", &g.ESP_Team);
 
         ImGui::EndChild();
@@ -136,7 +137,7 @@ void CFramework::RenderMenu()
 
         ImGui::NewLine();
 
-        ImGui::CustomSliderInt("MaxFramerate", "##MaxFrame", &g.MaxFramerate, 30, 500);
+        ImGui::CustomSliderInt("MaxFramerate", "##MaxFrame", &g.iMaxFramerate, 30, 500);
 
         ImGui::EndChild();
         ImGui::BeginChild("##C031", ImVec2(ImGui::GetContentRegionAvail()), true);
@@ -220,6 +221,7 @@ void CFramework::RenderMenu()
         ImGui::Separator();
         ImGui::Spacing();
 
+        ImGui::CustomSliderFloat("Radar scale", "##R_SCALE", &g.ESP_RadarScale, 1.f, 20.f);
         ImGui::CustomSliderInt("Distance", "##Distance", &g.ESP_MaxDistance, 10, 100);
 
         ImGui::Spacing();

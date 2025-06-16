@@ -6,16 +6,14 @@ CEntity lastTarget = CEntity();
 
 void CFramework::RenderInfo()
 {
-    ImGui::SetNextWindowPos(ImVec2(g.ptPoint.x, g.ptPoint.y));
-    ImGui::SetNextWindowSize(ImVec2(g.rcSize.right, g.rcSize.bottom));
-    ImGui::Begin("##Info", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground);
-
     // FPS
     String(Vector2(3.f, 3.f), TEXT_COLOR, 1.f, std::to_string((int)ImGui::GetIO().Framerate).c_str());
 
     // FOV Circle
     if (g.AimBotEnable && g.bShowFOV)
+    {
         DrawCircle(Vector2((g.rcSize.right / 2.f), (g.rcSize.bottom / 2.f)), g.AimFOV, g.bRainbowFOV ? GenerateRainbow() : g.Color_AimFOV, 0.35f);
+    }
 
     // Crosshair
     if (g.CrosshairEnable)
@@ -35,8 +33,6 @@ void CFramework::RenderInfo()
             break;
         }
     }
-
-    ImGui::End();
 }
 
 void CFramework::RenderESP()
@@ -48,32 +44,32 @@ void CFramework::RenderESP()
     CEntity target = CEntity();
     Vector2 ScreenMiddle{ g.rcSize.right / 2.f, g.rcSize.bottom / 2.f };
 
-    // Local
+    // Local, ViewMatrix
     CEntity local = CEntity();
+    CEntity* pLocal = &local;
     local.m_address = offset.GetLocal();
     uintptr_t entitylist = m.Read<uintptr_t>(m.m_dwClientBaseAddr + offset.dwEntityList);
 
-    if (!local.UpdateStatic(entitylist))
+    if (!local.UpdateStaticData(entitylist))
         return;
     else if (!local.Update())
         return;
 
-    // ViewMatrixとかいろいろ
     Matrix ViewMatrix = m.Read<Matrix>(m.m_dwClientBaseAddr + offset.dwViewMatrix);
 
-    CEntity* pLocal = &local;
-
-    // 2D Radar
-    float s_radar_scale{ 12.f };
-    Vector2 s_radar_size{ 250.f, 250.f };
-    Vector2 s_radar_pos{ 25.f, g.rcSize.bottom - (s_radar_size.y + 25.f) };
-    Vector2 s_radar_center{ s_radar_pos.x + s_radar_size.x / 2.f, s_radar_pos.y + s_radar_size.y / 2.f };
-
     // Radar
-    DrawLine(Vector2(s_radar_center.x, s_radar_pos.y), Vector2(s_radar_center.x, s_radar_pos.y + s_radar_size.y), ImColor(1.f, 1.f, 1.f, 1.f), 1.f);
-    DrawLine(Vector2(s_radar_pos.x, s_radar_center.y), Vector2(s_radar_pos.x + s_radar_size.x, s_radar_center.y), ImColor(1.f, 1.f, 1.f, 1.f), 1.f);
-    DrawCircleFilled(s_radar_center, 3.f, ImColor(0.f, 0.65f, 1.f, 1.f), 1.f);
+    static Vector2 s_radar_size{ 250.f, 250.f };
+    static Vector2 s_radar_pos{ 25.f, g.rcSize.bottom - (s_radar_size.y + 25.f) };
+    static Vector2 s_radar_center = { s_radar_pos.x + s_radar_size.x / 2.f, s_radar_pos.y + s_radar_size.y / 2.f };
 
+    if (g.ESP_Radar)
+    {
+        DrawLine(Vector2(s_radar_center.x, s_radar_pos.y), Vector2(s_radar_center.x, s_radar_pos.y + s_radar_size.y), ImColor(1.f, 1.f, 1.f, 1.f), 1.f);
+        DrawLine(Vector2(s_radar_pos.x, s_radar_center.y), Vector2(s_radar_pos.x + s_radar_size.x, s_radar_center.y), ImColor(1.f, 1.f, 1.f, 1.f), 1.f);
+        DrawCircleFilled(s_radar_center, 3.f, ImColor(0.f, 0.65f, 1.f, 1.f), 1.f);
+    }
+
+    // ESP Loop
     for (auto& entity : this->GetEntityList())
     {
         CEntity* pEntity = &entity;
@@ -81,74 +77,66 @@ void CFramework::RenderESP()
         if (!pEntity->Update())
             continue;
 
-        std::vector<Vector3> BoneList;
+        const float fDistance = ((pLocal->m_vOldOrigin - pEntity->m_vOldOrigin).Length() * 0.01905f);
 
-        if (g.AimBotEnable || g.bSkeleton)
-            BoneList = pEntity->GetBoneList();
-
-        // 距離を取得
-        const float flDistance = ((pLocal->m_vOldOrigin - pEntity->m_vOldOrigin).Length() * 0.01905f);
-
-        // 各種チェック
-        if (g.ESP_MaxDistance < flDistance)
-            continue;
-        else if (!g.ESP_Team && pEntity->m_iTeamNum == pLocal->m_iTeamNum)
+        if (g.ESP_MaxDistance < fDistance)
             continue;
 
-        BoundingBox box = pEntity->GetBoundingBoxData(ViewMatrix);
+        BoundingBox bbox = pEntity->GetBoundingBoxData(ViewMatrix);
 
-        if (box.left == 0)
+        if (bbox.left == 0 && bbox.right == 0)
             continue;
 
-        // サイズ算出
-        const int Height = box.bottom - box.top;
-        const int Width = box.right - box.left;
-        const int Center = (box.right - box.left) / 2.f;
-        const int bScale = (box.right - box.left) / 3.f;
+        const int Height = bbox.bottom - bbox.top;
+        const int Width = bbox.right - bbox.left;
+        const int Center = (bbox.right - bbox.left) / 2.f;
+        const int bScale = (bbox.right - bbox.left) / 3.f;
 
-        // 対象が見えてるかチェックする。
+        // ToDo:
         bool visible = false;
 
-        // 色を決める
-        ImColor shadow_color = WithAlpha(g.Color_ESP_Shadow, g.m_flShadowAlpha);
+        ImColor shadow_color = WithAlpha(g.Color_ESP_Shadow, g.m_flShadowAlpha); // color + alpha
         ImColor tempColor = pLocal->m_iTeamNum == pEntity->m_iTeamNum ? g.Color_ESP_Team : g.Color_ESP_Enemy;
        
-        if (pEntity->m_address == lastTarget.m_address)
+        if (pEntity->m_address == lastTarget.m_address) // aiming target
             tempColor = g.Color_ESP_AimTarget;
 
-        ImColor color = WithAlpha(tempColor, g.m_flGlobalAlpha);
+        ImColor visualColor = WithAlpha(tempColor, g.m_flGlobalAlpha);
 
         // Line
         if (g.bLine)
-            DrawLine(Vector2(g.rcSize.right / 2.f, g.rcSize.bottom), Vector2(box.right - (Width / 2), box.bottom), color, g.m_flGlobalAlpha);
+        {
+            DrawLine(Vector2(g.rcSize.right / 2.f, g.rcSize.bottom), Vector2(bbox.right - (Width / 2), bbox.bottom), visualColor, g.m_flGlobalAlpha);
+        }
 
         // Box
         if (g.bBox)
         {
             // BoxFilled
             if (g.bFilled)
-                RectFilled(box.left, box.top, box.right, box.bottom, shadow_color, g.m_flShadowAlpha);
+                RectFilled(bbox.left, bbox.top, bbox.right, bbox.bottom, shadow_color, g.m_flShadowAlpha);
 
-            // Shadow
-            DrawLine(Vector2(box.left - 1, box.top - 1), Vector2(box.right + 2, box.top - 1), shadow_color);
-            DrawLine(Vector2(box.left - 1, box.top), Vector2(box.left - 1, box.bottom + 2), shadow_color);
-            DrawLine(Vector2(box.right + 1, box.top), Vector2(box.right + 1, box.bottom + 2), shadow_color);
-            DrawLine(Vector2(box.left - 1, box.bottom + 1), Vector2(box.right + 1, box.bottom + 1), shadow_color);
+            /* Shadow
+            DrawLine(Vector2(bbox.left - 1, bbox.top - 1), Vector2(bbox.right + 2, bbox.top - 1), shadow_color);
+            DrawLine(Vector2(bbox.left - 1, bbox.top), Vector2(bbox.left - 1, bbox.bottom + 2), shadow_color);
+            DrawLine(Vector2(bbox.right + 1, bbox.top), Vector2(bbox.right + 1, bbox.bottom + 2), shadow_color);
+            DrawLine(Vector2(bbox.left - 1, bbox.bottom + 1), Vector2(bbox.right + 1, bbox.bottom + 1), shadow_color);
+            */
 
             switch (g.ESP_BoxType)
             {
             case 0:
-                DrawBox(box.right, box.left, box.top, box.bottom, color);
+                DrawBox(bbox.right, bbox.left, bbox.top, bbox.bottom, visualColor);
                 break;
             case 1:
-                DrawLine(Vector2(box.left, box.top), Vector2(box.left + bScale, box.top), color); // Top
-                DrawLine(Vector2(box.right, box.top), Vector2(box.right - bScale, box.top), color);
-                DrawLine(Vector2(box.left, box.top), Vector2(box.left, box.top + bScale), color); // Left
-                DrawLine(Vector2(box.left, box.bottom), Vector2(box.left, box.bottom - bScale), color);
-                DrawLine(Vector2(box.right, box.top), Vector2(box.right, box.top + bScale), color); // Right
-                DrawLine(Vector2(box.right, box.bottom), Vector2(box.right, box.bottom - bScale), color);
-                DrawLine(Vector2(box.left, box.bottom), Vector2(box.left + bScale, box.bottom), color); // Bottom
-                DrawLine(Vector2(box.right + 1, box.bottom), Vector2(box.right - bScale, box.bottom), color);
+                DrawLine(Vector2(bbox.left, bbox.top), Vector2(bbox.left + bScale, bbox.top), visualColor); // Top
+                DrawLine(Vector2(bbox.right, bbox.top), Vector2(bbox.right - bScale, bbox.top), visualColor);
+                DrawLine(Vector2(bbox.left, bbox.top), Vector2(bbox.left, bbox.top + bScale), visualColor); // Left
+                DrawLine(Vector2(bbox.left, bbox.bottom), Vector2(bbox.left, bbox.bottom - bScale), visualColor);
+                DrawLine(Vector2(bbox.right, bbox.top), Vector2(bbox.right, bbox.top + bScale), visualColor); // Right
+                DrawLine(Vector2(bbox.right, bbox.bottom), Vector2(bbox.right, bbox.bottom - bScale), visualColor);
+                DrawLine(Vector2(bbox.left, bbox.bottom), Vector2(bbox.left + bScale, bbox.bottom), visualColor); // Bottom
+                DrawLine(Vector2(bbox.right + 1, bbox.bottom), Vector2(bbox.right - bScale, bbox.bottom), visualColor);
                 break;
             }
         }
@@ -156,89 +144,98 @@ void CFramework::RenderESP()
         // Skeleton
         if (g.bSkeleton)
         {
-            if (BoneList.size() == 32) {
-                // 頭の円をレンダリング
-                Vector2 pHead, pNeck;
-                if (!WorldToScreen(ViewMatrix, g.rcSize, BoneList[BONE_HEAD], pHead) ||
-                    !WorldToScreen(ViewMatrix, g.rcSize, BoneList[BONE_NECK], pNeck))
-                    continue;
+             CSkeletonArray bArray = pEntity->GetBoneList();
 
-                DrawCircle(pHead, pNeck.y - pHead.y, color, g.m_flGlobalAlpha);
+             // 頭の円をレンダリング
+             Vector2 pHead, pNeck;
+             if (!WorldToScreen(ViewMatrix, g.rcSize, bArray.bone[BONE_HEAD].position, pHead) ||
+                 !WorldToScreen(ViewMatrix, g.rcSize, bArray.bone[BONE_NECK].position, pNeck))
+                 continue;
 
-                // 線を引くためのペアを作成する
-                const Vector3 skeleton_list[][2] = {
-                    { BoneList[BONE_NECK], BoneList[BONE_HIP] },
-                    { BoneList[BONE_NECK], BoneList[BONE_LEFT_SHOULDER] },
-                    { BoneList[BONE_LEFT_SHOULDER], BoneList[BONE_LEFT_ARM] },
-                    { BoneList[BONE_LEFT_ARM], BoneList[BONE_LEFT_HAND] },
-                    { BoneList[BONE_NECK], BoneList[BONE_RIGHT_SHOULDER] },
-                    { BoneList[BONE_RIGHT_SHOULDER], BoneList[BONE_RIGHT_ARM] },
-                    { BoneList[BONE_RIGHT_ARM], BoneList[BONE_RIGHT_HAND] },
-                    { BoneList[BONE_HIP], BoneList[BONE_LEFT_KNEE] },
-                    { BoneList[BONE_LEFT_KNEE], BoneList[BONE_LEFT_FEET] },
-                    { BoneList[BONE_HIP], BoneList[BONE_RIGHT_KNEE] },
-                    { BoneList[BONE_RIGHT_KNEE], BoneList[BONE_RIGHT_FEET] }
-                };
+             DrawCircle(pHead, (pNeck.y - pHead.y) * 1.25, visualColor, g.m_flGlobalAlpha);
 
-                // WorldToScreenを行い各ペアをレンダリングする.
-                for (int j = 0; j < 11; j++)
-                {
-                    Vector2 vOut0, vOut1;
-                    if (!WorldToScreen(ViewMatrix, g.rcSize, skeleton_list[j][0], vOut0) ||
-                        !WorldToScreen(ViewMatrix, g.rcSize, skeleton_list[j][1], vOut1))
-                        break;
+             // 線を引くためのペアを作成する
+             const Vector3 skeleton_list[][2] = {
+                 { bArray.bone[BONE_NECK].position, bArray.bone[BONE_HIP].position },
+                 { bArray.bone[BONE_NECK].position, bArray.bone[BONE_LEFT_SHOULDER].position },
+                 { bArray.bone[BONE_LEFT_SHOULDER].position, bArray.bone[BONE_LEFT_ARM].position },
+                 { bArray.bone[BONE_LEFT_ARM].position, bArray.bone[BONE_LEFT_HAND].position },
+                 { bArray.bone[BONE_NECK].position, bArray.bone[BONE_RIGHT_SHOULDER].position },
+                 { bArray.bone[BONE_RIGHT_SHOULDER].position, bArray.bone[BONE_RIGHT_ARM].position },
+                 { bArray.bone[BONE_RIGHT_ARM].position, bArray.bone[BONE_RIGHT_HAND].position },
+                 { bArray.bone[BONE_HIP].position, bArray.bone[BONE_LEFT_KNEE].position },
+                 { bArray.bone[BONE_LEFT_KNEE].position, bArray.bone[BONE_LEFT_FEET].position },
+                 { bArray.bone[BONE_HIP].position, bArray.bone[BONE_RIGHT_KNEE].position },
+                 { bArray.bone[BONE_RIGHT_KNEE].position, bArray.bone[BONE_RIGHT_FEET].position }
+             };
 
-                    DrawLine(vOut0, vOut1, color);
-                }
-            }
+             // WorldToScreenを行い各ペアをレンダリングする.
+             for (int j = 0; j < 11; j++)
+             {
+                 Vector2 vOut0{}, vOut1{};
+                 if (!WorldToScreen(ViewMatrix, g.rcSize, skeleton_list[j][0], vOut0) ||
+                     !WorldToScreen(ViewMatrix, g.rcSize, skeleton_list[j][1], vOut1))
+                     break;
+
+                 DrawLine(vOut0, vOut1, visualColor);
+             }
         }
 
         // Healthbar
         if (g.bHealth)
-            HealthBar(box.left - 3, box.bottom + 1, 1, -Height - 1, pEntity->m_iHealth, pEntity->m_iMaxHealth, shadow_color, g.m_flGlobalAlpha); // Health
+        {
+            HealthBar(bbox.left - 3, bbox.bottom + 1, 1, -Height - 1, pEntity->m_iHealth, pEntity->m_iMaxHealth, shadow_color, g.m_flGlobalAlpha);
+        }
 
         // Name
         if (g.bName)
-            StringEx(Vector2(box.right - Center - (ImGui::CalcTextSize(pEntity->m_namePlayer).x / 2.f), box.top - ImGui::GetFontSize()), shadow_color, g.m_flGlobalAlpha, ImGui::GetFontSize(), pEntity->m_namePlayer);
-
+        {
+            StringEx(Vector2(bbox.right - Center - (ImGui::CalcTextSize(pEntity->m_szPlayerName.c_str()).x / 2.f), bbox.top - ImGui::GetFontSize()), shadow_color, g.m_flGlobalAlpha, ImGui::GetFontSize(), pEntity->m_szPlayerName.c_str());
+        }
+        
         // Distance & Weapon
-        std::string outStr{};
+        if (g.bDistance || g.bWeapon)
+        {
+            std::string szResult{};
 
-        // Distance
-        if (g.bDistance)
-            outStr += "[ " + std::to_string((int)flDistance) + "m ]";
+            if (g.bDistance)
+                szResult += "[ " + std::to_string((int)fDistance) + "m ]";
 
-        // Weapon
-        if (g.bWeapon)
-            outStr += " " + pEntity->m_nameWeapon;
+            if (g.bWeapon)
+                szResult += " " + pEntity->m_szWeaponName;
 
-        // Rendering
-        if (g.bDistance || g.bWeapon && outStr.size() > 0)
-            StringEx(Vector2(box.right - Center - (ImGui::CalcTextSize(outStr.c_str()).x / 2.f), box.bottom + 1), shadow_color, g.m_flGlobalAlpha, ImGui::GetFontSize(), outStr.c_str());
+            // Rendering
+            if (g.bDistance || g.bWeapon && szResult.size() > 0)
+                StringEx(Vector2(bbox.right - Center - (ImGui::CalcTextSize(szResult.c_str()).x / 2.f), bbox.bottom + 1), shadow_color, g.m_flGlobalAlpha, ImGui::GetFontSize(), szResult.c_str());
+        }
 
         // 2D Radar
-        Vector3 delta = (pEntity->m_vOldOrigin - pLocal->m_vOldOrigin) * -1;
-        float yaw = pLocal->GetViewAngle().y * (M_PI / 180.f);
-        float cosYaw = cosf(yaw);
-        float sinYaw = sinf(yaw);
+        if (g.ESP_Radar)
+        {
+            Vector3 delta = (pEntity->m_vOldOrigin - pLocal->m_vOldOrigin) * -1;
+            float yaw = pLocal->GetViewAngle().y * (M_PI / 180.f);
+            float cosYaw = cosf(yaw);
+            float sinYaw = sinf(yaw);
 
-        Vector2 rotated{
-            delta.y * cosYaw - delta.x * sinYaw,
-            delta.y * sinYaw + delta.x * cosYaw
-        };
+            Vector2 rotated{
+                delta.y * cosYaw - delta.x * sinYaw,
+                delta.y * sinYaw + delta.x * cosYaw
+            };
 
-        rotated /= s_radar_scale;
-        rotated += s_radar_center;
+            rotated /= g.ESP_RadarScale;
+            rotated += s_radar_center;
 
-        DrawCircleFilled(rotated, 3.f, color, 1.f);
-
-        if (flDistance > g.AimMaxDistance)
-            continue;
+            DrawCircleFilled(rotated, 3.f, visualColor, 1.f);
+        }
 
         // AimBot
         // 多分FOV外の敵も部分的に狙ってるので要修正
         if (g.AimBotEnable && pLocal->m_iTeamNum != pEntity->m_iTeamNum)
         {
+            if (fDistance > g.AimMaxDistance)
+                continue;
+
+            /*
             for (const auto& bone : BoneList)
             {
                 Vector2 BoneScreen{};
@@ -273,9 +270,9 @@ void CFramework::RenderESP()
                     break;
                 }
             }
+            */
         }
 
-        BoneList.clear();
     }
 
     // AimBot - ToDo

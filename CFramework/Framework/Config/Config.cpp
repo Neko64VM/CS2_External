@@ -245,7 +245,7 @@ void ConfigManager::LoadSetting(const std::string filename)
             g.CrosshairEnable = JSON["CrosshairEnable"];
             g.CrosshairSize = JSON["CrosshairSize"];
             g.CrosshairType = JSON["CrosshairType"];
-            g.MaxFramerate = JSON["MaxFramerate"];
+            g.iMaxFramerate = JSON["MaxFramerate"];
             // Color
             g.m_flGlobalAlpha = JSON["GlobalAlpha"];
             g.m_flShadowAlpha = JSON["ShadowAlpha"];
@@ -316,7 +316,7 @@ void ConfigManager::SaveSetting(const std::string filename)
         JSON["CrosshairEnable"] = g.CrosshairEnable;
         JSON["CrosshairSize"] = g.CrosshairSize;
         JSON["CrosshairType"] = g.CrosshairType;
-        JSON["MaxFramerate"] = g.MaxFramerate;
+        JSON["MaxFramerate"] = g.iMaxFramerate;
         // Color
         JSON["GlobalAlpha"] = g.m_flGlobalAlpha;
         JSON["ShadowAlpha"] = g.m_flShadowAlpha;

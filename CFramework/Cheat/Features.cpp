@@ -1,43 +1,5 @@
 #include "CFramework.h"
 
-void CFramework::MiscAll()
-{
-    /*
-    // Local
-    CEntity local = CEntity();
-    local.m_address = offset.GetLocal();
-    uintptr_t entitylist = m.Read<uintptr_t>(m.m_dwClientBaseAddr + offset.dwEntityList);
-
-    if (!local.UpdateStatic(entitylist))
-        return;
-    else if (!local.Update())
-        return;
-
-    // TriggerBot
-    if (g.TriggerBotENable)
-    {
-        // Your TriggerBot
-    }
-
-    // BunnyHop
-    if (g.bHopEnable &&  utils::IsKeyDown(VK_SPACE))
-    {
-        uint32_t flag = local.GetFlag();
-
-        if (flag == ????)
-            m.Write<uint32_t>(m.m_dwClientBaseAddr + Game->dwForceJump, ????);
-        else
-            m.Write<uint32_t>(m.m_dwClientBaseAddr + Game->dwForceJump, ????);
-    }
-
-    // RCS
-    if (g.RCS_Enable)
-    {
-        // Your RCS
-    }
-    */
-}
-
 bool CFramework::AimBotKeyCheck(DWORD& AimKey0, DWORD& AimKey1, int AimKeyMode)
 {
     // ñ≥èåèÇ≈AimBotÇóLå¯Ç…Ç∑ÇÈ

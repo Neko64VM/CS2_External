@@ -1,6 +1,7 @@
 #include "Cheat/CFramework.h"
 #include "Framework/Overlay/Overlay.h"
 #include "Framework/ImGui/Fonts/RobotoRegular.h"
+#pragma comment(lib, "WinMM.lib")
 
 auto overlay = std::make_unique<Overlay>();
 auto cheat = std::make_unique<CFramework>();
@@ -13,8 +14,6 @@ void Memory::SetBaseAddress()
 
 void Overlay::OverlayUserFunction()
 {
-	cheat->MiscAll();
-
 	cheat->RenderInfo();
 
 	if (g.VisualEnable)
@@ -22,6 +21,8 @@ void Overlay::OverlayUserFunction()
 
 	if (g.bShowMenu)
 		cheat->RenderMenu();
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000 / g.iMaxFramerate));
 }
 
 // DEBUG時にはコンソールウィンドウを表示する

@@ -1,11 +1,6 @@
 #include "CFramework.h"
 
-const int ReadCount = 1024;
-
-std::vector<CEntity> CFramework::GetEntityList() {
-    std::lock_guard<std::mutex> lock(list_mutex);
-    return EntityList;
-}
+constexpr int ReadCount = 64;
 
 void CFramework::UpdateList()
 {
@@ -13,27 +8,30 @@ void CFramework::UpdateList()
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(333));
 
-        CEntity local = CEntity();
+        // EntityList found?
+        auto pEntityList = m.Read<uintptr_t>(m.m_dwClientBaseAddr + offset.dwEntityList);
 
-        // Read EntityList
-        auto list_addr = m.Read<uintptr_t>(m.m_dwClientBaseAddr + offset.dwEntityList);
-
-        if (list_addr == NULL)
+        if (pEntityList == NULL)
             continue;
 
-        // Gte Local
+        // Get LocalPlayer
+        CEntity local = CEntity();
         local.m_address = m.Read<uintptr_t>(m.m_dwClientBaseAddr + offset.dwLocalPlayerController);
 
-        if (!local.UpdateStatic(list_addr))
+        if (!local.IsAlive())
+            continue;
+
+        if (!local.UpdateStaticData(pEntityList))
             continue;
         else if (!local.Update())
             continue;
 
-        std::vector<CEntity> list_result;
+        std::vector<CEntity> list_result{};
 
+        // Loop
         for (int i = 0; i < ReadCount; i++)
         {
-            uintptr_t entity_entry = m.Read<uintptr_t>(list_addr + (0x8 * (i & 0x7FFF) >> 9) + 0x10);
+            uintptr_t entity_entry = m.Read<uintptr_t>(pEntityList + (0x8 * (i & 0x7FFF) >> 9) + 0x10);
 
             if (entity_entry == NULL)
                 continue;
@@ -43,23 +41,20 @@ void CFramework::UpdateList()
             CEntity p = CEntity();
             p.m_address = m.Read<uintptr_t>(entity_entry + 120 * (i & 0x1FF));
 
-            uintptr_t classNamePtr = m.ReadChain(p.m_address, { 0x10, 0x20 });
-            std::string class_name = m.ReadStringA(classNamePtr);
+            if (!p.IsAlive())
+                continue;
 
-            if (class_name.size() > 0)
+            // player check
+            if (!p.GetEntityClassName().compare("cs_player_controller"))
             {
-                // if entity is player
-                if (!class_name.compare("cs_player_controller"))
-                {
-                    if (!p.UpdateStatic(list_addr))
-                        continue;
-                    else if (!p.Update())
-                        continue;
-
-                    p.m_nameClass = class_name;
-                    list_result.push_back(p);
+                // some checks
+                if (!p.UpdateStaticData(pEntityList))
                     continue;
-                }
+                else if (p.m_iTeamNum == local.m_iTeamNum)
+                    continue;
+
+                list_result.push_back(p);
+                continue;
             }
         }
 

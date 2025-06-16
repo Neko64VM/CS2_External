@@ -43,6 +43,7 @@ struct GlobalVars
 
     // Visual
     bool VisualEnable{ true };
+    bool ESP_Radar{ true };
     bool ESP_Team{ false };
     bool bBox{ true };
     bool bFilled{ false };
@@ -52,6 +53,7 @@ struct GlobalVars
     bool bDistance{ true };
     bool bName{ true };
     bool bWeapon{ true };
+    float ESP_RadarScale{ 12.f };
     int ESP_BoxType{ 1 };
     int ESP_MaxDistance{ 100 };
 
@@ -59,7 +61,7 @@ struct GlobalVars
     bool CrosshairEnable{ false };
     int CrosshairSize{ 5 };
     int CrosshairType{ 0 };
-    int MaxFramerate{ 185 };
+    int iMaxFramerate{ 185 };
 
     // Colors
     float m_flGlobalAlpha{ 0.925f };

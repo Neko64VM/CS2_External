@@ -7,8 +7,6 @@
 #include "../Framework/ImGui/Custom.h"
 #include "SDK/CEntity/CEntity.h"
 #include <mutex>
-#include <atomic>
-#pragma comment(lib, "WinMM.lib")
 #pragma comment(lib, "freetype.lib")
 
 class CFramework
@@ -17,7 +15,6 @@ public:
     ImFont* icon{ nullptr };
 
     void UpdateList();
-    void MiscAll();
 
 	void RenderInfo();
 	void RenderMenu();
@@ -26,12 +23,15 @@ private:
     // Thread safe.
     std::mutex list_mutex;
     std::vector<CEntity> EntityList{};
-    std::vector<CEntity> GetEntityList();
-
-    ImColor TEXT_COLOR{ 1.f, 1.f, 1.f, 1.f };
+    std::vector<CEntity> GetEntityList() {
+        std::lock_guard<std::mutex> lock(list_mutex);
+        return EntityList;
+    }
 
     // AimBot KeyChecker
     bool AimBotKeyCheck(DWORD& AimKey0, DWORD& AimKey1, int AimKeyMode);
+
+    ImColor TEXT_COLOR{ 1.f, 1.f, 1.f, 1.f };
 
     // Render.cpp
     ImVec2 ToImVec2(const ImVec2& value); // Convert to int
