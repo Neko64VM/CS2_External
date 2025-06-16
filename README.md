@@ -5,6 +5,7 @@
 ## 機能
 * AimBot
 * ESP
+* 2D Radar
 * Simple Overlay
 * PatternScanner
 * ConfigSystem
