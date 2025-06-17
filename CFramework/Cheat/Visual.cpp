@@ -47,7 +47,7 @@ void CFramework::RenderESP()
     // Local, ViewMatrix
     CEntity local = CEntity();
     CEntity* pLocal = &local;
-    local.m_address = offset.GetLocal();
+    local.m_address = m.Read<uintptr_t>(m.m_dwClientBaseAddr + offset.dwLocalPlayerController);
     uintptr_t entitylist = m.Read<uintptr_t>(m.m_dwClientBaseAddr + offset.dwEntityList);
 
     if (!local.UpdateStaticData(entitylist))
@@ -67,6 +67,41 @@ void CFramework::RenderESP()
         DrawLine(Vector2(s_radar_center.x, s_radar_pos.y), Vector2(s_radar_center.x, s_radar_pos.y + s_radar_size.y), ImColor(1.f, 1.f, 1.f, 1.f), 1.f);
         DrawLine(Vector2(s_radar_pos.x, s_radar_center.y), Vector2(s_radar_pos.x + s_radar_size.x, s_radar_center.y), ImColor(1.f, 1.f, 1.f, 1.f), 1.f);
         DrawCircleFilled(s_radar_center, 3.f, ImColor(0.f, 0.65f, 1.f, 1.f), 1.f);
+    }
+
+    // C4
+    {
+        uintptr_t pC4 = GetC4Pointer();
+
+        if (pC4 != NULL)
+        {
+            float flC4Blow = m.Read<float>(pC4 + 0xFC0); // m_flC4Blow
+            uintptr_t GlobalVars = m.Read<uintptr_t>(m.m_dwClientBaseAddr + offset.dwGlobalVars);
+            float flCurrentTime = m.Read<float>(GlobalVars + 0x34);
+
+            uintptr_t node = m.Read<uintptr_t>(pC4 + Offset::m_pGameSceneNode);
+            Vector3 pos = m.Read<Vector3>(node + 0xD0);
+
+            //  m_vecPrevAbsOrigin = 0xD0; // Node->m_vecPrevAbsOrigin
+
+            if (flCurrentTime <= flC4Blow)
+            {
+                static const char* BombSiteNameList[]{ "A", "B" };
+                int BombSite = m.Read<int>(pC4 + 0xF94); // m_nBombSite _ 0-A / 1-B
+
+                float result = flC4Blow - flCurrentTime;
+                Vector2 vOut{};
+                
+                if (WorldToScreen(ViewMatrix, g.rcSize, pos, vOut))
+                {
+                    std::string szC4 = "C4 [" + std::to_string((int)result) + "s]";
+                    DrawCircleFilled(vOut, 2.f, ImColor(0.f, 1.f, 0.f, 1.f), 1.f);
+
+                    String(Vector2(vOut.x - (ImGui::CalcTextSize(szC4.c_str()).x / 2.f), vOut.y + 1.f), ImColor(0.f, 1.f, 0.f, 1.f), ImGui::GetFontSize(), szC4.c_str());
+
+                }
+            }
+        }
     }
 
     // ESP Loop

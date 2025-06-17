@@ -22,10 +22,17 @@ public:
 private:
     // Thread safe.
     std::mutex list_mutex;
+    std::mutex c4_mutex;
+    uintptr_t plantedC4{ 0 };
     std::vector<CEntity> EntityList{};
     std::vector<CEntity> GetEntityList() {
         std::lock_guard<std::mutex> lock(list_mutex);
         return EntityList;
+    }
+
+    uintptr_t GetC4Pointer() {
+        std::lock_guard<std::mutex> lock(c4_mutex);
+        return plantedC4;
     }
 
     // AimBot KeyChecker

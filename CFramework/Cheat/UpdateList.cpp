@@ -26,6 +26,20 @@ void CFramework::UpdateList()
         else if (!local.Update())
             continue;
 
+        // C4
+        bool isC4Planted = m.Read<bool>(m.m_dwClientBaseAddr + offset.dwPlantedC4 - 0x8);
+
+        if (isC4Planted)
+        {
+            uintptr_t pPlantedC4 = m.Read<uintptr_t>(m.m_dwClientBaseAddr + offset.dwPlantedC4);
+
+            if (pPlantedC4 != NULL)
+            {
+                std::lock_guard<std::mutex> lock(c4_mutex);
+                plantedC4 = m.Read<uintptr_t>(pPlantedC4);
+            }
+        }
+
         std::vector<CEntity> list_result{};
 
         // Loop

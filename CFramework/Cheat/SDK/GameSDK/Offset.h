@@ -30,12 +30,13 @@ class GOffset
 {
 public:
 	bool InitOffset();
-	uintptr_t GetLocal();
 
-	uintptr_t dwViewAngles;
-	uintptr_t dwViewMatrix;
-	uintptr_t dwEntityList;
-	uintptr_t dwLocalPlayerController;
+	uintptr_t dwViewAngles{ 0 };
+	uintptr_t dwViewMatrix{ 0 };
+	uintptr_t dwEntityList{ 0 };
+	uintptr_t dwLocalPlayerController{ 0 };
+	uintptr_t dwGlobalVars{ 0 };
+	uintptr_t dwPlantedC4{ 0 };
 };
 
 extern GOffset offset;
