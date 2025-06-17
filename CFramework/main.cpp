@@ -2,6 +2,7 @@
 #include "Framework/Overlay/Overlay.h"
 #include "Framework/ImGui/Fonts/RobotoRegular.h"
 #pragma comment(lib, "WinMM.lib")
+#pragma comment(lib, "freetype.lib")
 
 auto overlay = std::make_unique<Overlay>();
 auto cheat = std::make_unique<CFramework>();
@@ -97,6 +98,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.IniFilename = nullptr;
 	io.LogFilename = nullptr;
+
+	ImFontConfig cfg;
+	cfg.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
 
 	// Load Font
 	io.Fonts->AddFontFromMemoryCompressedTTF(RobotoRegular_compressed_data, RobotoRegular_compressed_size, 13.f, nullptr);
